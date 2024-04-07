@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listed Building Data Vis</title>
+    <script src = "https://d3js.org/d3.v7.min.js"></script>
+</head>
+<style> 
+body{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+#list_explain_p{
+  margin-left: 10%;
+  margin-right: 10%;
+}
+#list_explain_p2{
+  margin-left: 15%;
+  margin-right: 15%;
+  color: grey;
+  font-style: italic;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#svg {
+      width: 50%;
+      height: 300px;
+      align-content: center;
+}
+#timelineDiv{
+  width: 100%;
+  text-align: center;
+}
+#timeline{
+  width: 950px;
+}
+#buttonsDiv{
+  width: 100%;
+  text-align: center;
+}
+.buttons{
+  width: 100px;
+}
+.bar_flexwrapper{
+  display: flex;
+}
+#bar_yAxis_title{
+text-align: center;
+width: 10%;
+margin-top: 12%;
+margin-left: 10%;
+}
+#bar_xAxis_title{
+  margin-top: -5%;
+}
+#Vis{
+  text-align: center;
+}
+.bar:hover{
+  fill: rgb(255, 0, 0);
+}
+#gradings{
+  margin: 0;
+  margin-bottom: 5px;
+}
+#grade1{
+  color:#7a0177;
+  font-weight: bold;
+}
+#grade2S{
+  color:#c31a8a;
+  font-weight: bold;
+}
+#grade2{
+  color:#fa9db4;
+  font-weight: bold;
+}
+#date{
+  font-weight: bold;
+}
+#value{
+  font-weight: bold;
+}
+
+#grade_key_flexwrapper{
+  display: flex;
+  flex-wrap: nowrap;
+}
+#GKeyTitle{
+  margin-left: 30% ;
+  text-decoration: underline;
+  margin-bottom: 3px;
+}
+#Gkey{
+  color: white;
+  text-align: center;
+}
+#Key_div_G1{
+  background-color: #7a0177;
+  width: 15%;
+}
+#Key_div_G2S{
+  background-color: #c31a8a;
+  width: 15%;
+}
+#Key_div_G2{
+  background-color: #fa9db4;
+  width: 15%;
+}
+#key_buffer{
+  width: 30%;
+}
+
+.pies_flex_wrapper{
+  display: flex;
+  flex-wrap: wrap;
+}
+.pies{
+  width: 20%;
+  height: 250px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pies > svg {
+  align-items: center;
+}
+.pies >svg >g{
+  text-align: center;
+}
+polyline{
+  opacity: .3;
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+</style>
+
+<body>
+  <h2>Break Down of Listed Buildings between 0-2000AD</h2>
+  <p id = "list_explain_p">A listed building is one noted by Historic England for having some form of special architectural or historic significance, ensuring their protection as the site's use evolves over time for future generations.&nbsp;<a href="https://historicengland.org.uk/listing/what-is-designation/">A range of sites can be listed</a>, however the data presented reports on Listed Buildings specifically. <a href="https://historicengland.org.uk/listing/what-is-designation/listed-buildings/"> Historic England consider the general principles to listings to be</a>: </p>
+  <p id = "list_explain_p2">"All buildings built before 1700 which survive in anything like their original condition are likely to be listed, as are most buildings built between 1700 and 1850. Particularly careful selection is required for buildings from the period after 1945. Buildings less than 30 years old are not normally considered to be of special architectural or historic interest because they have yet to stand the test of time."</p>
+  <p id = "list_explain_p">The combined total amount of listed Buildings from 0-2000AD is {{allListedBuildings}}.</p>
+  <h4 > The following bar chart compares the total number of listed buildings based upon 200 year increments from 0-2000AD.</h4>
+  <h4> Allowing us to analyse the existing listed buildings that have survived</h4>
+  <h5> The data here excludes the 12 listed buildings ranging from 50,000BC - 0 </h5>
+  <h5>All Data received from the <a href="https://historicengland.org.uk/listing/the-list/advanced-search?searchType=nhleadvancedsearch">(Advanced) Search the List</a>  provided by Historic England</h5>
+  <h3>Adjust the time line to compare total numbers and hover over a bar for stats</h3>
+  
+  <div id= "buttonsDiv">
+  <button class = "buttons" id = "button1" onclick="update(data1)">0-200</button>
+  <button class = "buttons" id = "button2" onclick="update(data2)">200-400</button>
+  <button class = "buttons" id = "button3" onclick="update(data3)">400-600</button>
+  <button class = "buttons" id = "button4" onclick="update(data4)">600-800</button>
+  <button class = "buttons" id = "button5" onclick="update(data5)">800-1000</button>
+  <button class = "buttons" id = "button6" onclick="update(data6)">1000-1200</button>
+  <button class = "buttons" id = "button7" onclick="update(data7)">1200-1400</button>
+  <button class = "buttons" id = "button8" onclick="update(data8)">1400-1600</button>
+  <button class = "buttons" id = "button9" onclick="update(data9)">1600-1800</button>
+  <button class = "buttons" id = "button10" onclick="update(data10)">1800-2000</button>
+  </div>
+  <div id="timelineDiv">
+  
+  <input id= "timeline" type="range" name= "a" value = "0" max = "9"
+  oninput = " 
+  
+  if (this.value == 0){
+    update(data1)
+  }
+  if (this.value == 1){
+    update(data2)
+  }
+  if (this.value == 2){
+    update(data3)
+  }
+  if (this.value  == 3){
+    update(data4)
+  }
+  if (this.value  == 4){
+    update(data5)
+  }
+  if (this.value == 5){
+    update(data6)
+  }
+  if (this.value == 6){
+    update(data7)
+  }
+  if (this.value == 7){
+    update(data8)
+  }
+  if (this.value == 8){
+    update(data9)
+  }
+  if (this.value == 9){
+    update(data10)
+  }
+   ">
+  </div>
+
+<section class="bar_flexwrapper">
+<div id="bar_yAxis_title"><h4>Total Number of Listed Buildings</h4></div>
+<div id="Vis"></div>
+
+</section>
+
+
+
+<script>
+
+var data1 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}") }];
+
+var data2 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")}];
+
+var data3 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")}];
+
+var data4 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")}];
+
+var data5 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")},
+            {group: "800-1000", value: parseInt("{{listedBuildingList[4]}}"),grade1: parseInt("{{grade1Buildings[4]}}"), grade2S: parseInt("{{grade2StarBuildings[4]}}"), grade2: parseInt("{{grade2Buildings[4]}}")}];
+
+var data6 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")},
+            {group: "800-1000", value: parseInt("{{listedBuildingList[4]}}"),grade1: parseInt("{{grade1Buildings[4]}}"), grade2S: parseInt("{{grade2StarBuildings[4]}}"), grade2: parseInt("{{grade2Buildings[4]}}")},
+            {group: "1000-1200", value: parseInt("{{listedBuildingList[5]}}"),grade1: parseInt("{{grade1Buildings[5]}}"), grade2S: parseInt("{{grade2StarBuildings[5]}}"), grade2: parseInt("{{grade2Buildings[5]}}")}];
+
+var data7 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")},
+            {group: "800-1000", value: parseInt("{{listedBuildingList[4]}}"),grade1: parseInt("{{grade1Buildings[4]}}"), grade2S: parseInt("{{grade2StarBuildings[4]}}"), grade2: parseInt("{{grade2Buildings[4]}}")},
+            {group: "1000-1200", value: parseInt("{{listedBuildingList[5]}}"),grade1: parseInt("{{grade1Buildings[5]}}"), grade2S: parseInt("{{grade2StarBuildings[5]}}"), grade2: parseInt("{{grade2Buildings[5]}}")},
+            {group: "1200-1400", value: parseInt("{{listedBuildingList[6]}}"),grade1: parseInt("{{grade1Buildings[6]}}"), grade2S: parseInt("{{grade2StarBuildings[6]}}"), grade2: parseInt("{{grade2Buildings[6]}}")}];
+
+var data8 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")},
+            {group: "800-1000", value: parseInt("{{listedBuildingList[4]}}"),grade1: parseInt("{{grade1Buildings[4]}}"), grade2S: parseInt("{{grade2StarBuildings[4]}}"), grade2: parseInt("{{grade2Buildings[4]}}")},
+            {group: "1000-1200", value: parseInt("{{listedBuildingList[5]}}"),grade1: parseInt("{{grade1Buildings[5]}}"), grade2S: parseInt("{{grade2StarBuildings[5]}}"), grade2: parseInt("{{grade2Buildings[5]}}")},
+            {group: "1200-1400", value: parseInt("{{listedBuildingList[6]}}"),grade1: parseInt("{{grade1Buildings[6]}}"), grade2S: parseInt("{{grade2StarBuildings[6]}}"), grade2: parseInt("{{grade2Buildings[6]}}")},
+            {group: "1400-1600", value: parseInt("{{listedBuildingList[7]}}"),grade1: parseInt("{{grade1Buildings[7]}}"), grade2S: parseInt("{{grade2StarBuildings[7]}}"), grade2: parseInt("{{grade2Buildings[7]}}")}];
+
+var data9 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")},
+            {group: "800-1000", value: parseInt("{{listedBuildingList[4]}}"),grade1: parseInt("{{grade1Buildings[4]}}"), grade2S: parseInt("{{grade2StarBuildings[4]}}"), grade2: parseInt("{{grade2Buildings[4]}}")},
+            {group: "1000-1200", value: parseInt("{{listedBuildingList[5]}}"),grade1: parseInt("{{grade1Buildings[5]}}"), grade2S: parseInt("{{grade2StarBuildings[5]}}"), grade2: parseInt("{{grade2Buildings[5]}}")},
+            {group: "1200-1400", value: parseInt("{{listedBuildingList[6]}}"),grade1: parseInt("{{grade1Buildings[6]}}"), grade2S: parseInt("{{grade2StarBuildings[6]}}"), grade2: parseInt("{{grade2Buildings[6]}}")},
+            {group: "1400-1600", value: parseInt("{{listedBuildingList[7]}}"),grade1: parseInt("{{grade1Buildings[7]}}"), grade2S: parseInt("{{grade2StarBuildings[7]}}"), grade2: parseInt("{{grade2Buildings[7]}}")},
+            {group:"1600-1800", value: parseInt("{{listedBuildingList[8]}}"),grade1: parseInt("{{grade1Buildings[8]}}"), grade2S: parseInt("{{grade2StarBuildings[8]}}"), grade2: parseInt("{{grade2Buildings[8]}}")}];  
+
+var data10 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), grade1: parseInt("{{grade1Buildings[0]}}"), grade2S: parseInt("{{grade2StarBuildings[0]}}"), grade2: parseInt("{{grade2Buildings[0]}}")},
+            {group: "200-400", value:parseInt("{{listedBuildingList[1]}}"), grade1: parseInt("{{grade1Buildings[1]}}"), grade2S: parseInt("{{grade2StarBuildings[1]}}"), grade2: parseInt("{{grade2Buildings[1]}}")},
+            {group: "400-600", value: parseInt("{{listedBuildingList[2]}}"),grade1: parseInt("{{grade1Buildings[2]}}"), grade2S: parseInt("{{grade2StarBuildings[2]}}"), grade2: parseInt("{{grade2Buildings[2]}}")},
+            {group: "600-800", value: parseInt("{{listedBuildingList[3]}}"),grade1: parseInt("{{grade1Buildings[3]}}"), grade2S: parseInt("{{grade2StarBuildings[3]}}"), grade2: parseInt("{{grade2Buildings[3]}}")},
+            {group: "800-1000", value: parseInt("{{listedBuildingList[4]}}"),grade1: parseInt("{{grade1Buildings[4]}}"), grade2S: parseInt("{{grade2StarBuildings[4]}}"), grade2: parseInt("{{grade2Buildings[4]}}")},
+            {group: "1000-1200", value: parseInt("{{listedBuildingList[5]}}"),grade1: parseInt("{{grade1Buildings[5]}}"), grade2S: parseInt("{{grade2StarBuildings[5]}}"), grade2: parseInt("{{grade2Buildings[5]}}")},
+            {group: "1200-1400", value: parseInt("{{listedBuildingList[6]}}"),grade1: parseInt("{{grade1Buildings[6]}}"), grade2S: parseInt("{{grade2StarBuildings[6]}}"), grade2: parseInt("{{grade2Buildings[6]}}")},
+            {group: "1400-1600", value: parseInt("{{listedBuildingList[7]}}"),grade1: parseInt("{{grade1Buildings[7]}}"), grade2S: parseInt("{{grade2StarBuildings[7]}}"), grade2: parseInt("{{grade2Buildings[7]}}")},
+            {group:"1600-1800", value: parseInt("{{listedBuildingList[8]}}"),grade1: parseInt("{{grade1Buildings[8]}}"), grade2S: parseInt("{{grade2StarBuildings[8]}}"), grade2: parseInt("{{grade2Buildings[8]}}")},
+            {group: "1800-2000", value: parseInt("{{listedBuildingList[9]}}"),grade1: parseInt("{{grade1Buildings[9]}}"), grade2S: parseInt("{{grade2StarBuildings[9]}}"), grade2: parseInt("{{grade2Buildings[9]}}")}];
+
+  let btn1 = document.getElementById("button1");
+  let btn2 = document.getElementById("button2");
+  let btn3 = document.getElementById("button3");
+  let btn4 = document.getElementById("button4");
+  let btn5 = document.getElementById("button5");
+  let btn6 = document.getElementById("button6");
+  let btn7 = document.getElementById("button7");
+  let btn8 = document.getElementById("button8");
+  let btn9 = document.getElementById("button9");
+  let btn10 = document.getElementById("button10");
+  let slider = document.querySelector("input[type='range']");
+  
+  btn1.addEventListener("click",function(){
+    slider.value = 0
+  });
+  btn2.addEventListener("click",function(){
+    slider.value = 1
+  });
+  btn3.addEventListener("click",function(){
+    slider.value = 2
+  });
+  btn4.addEventListener("click",function(){
+    slider.value = 3
+  });
+  btn5.addEventListener("click",function(){
+    slider.value = 4
+  });
+  btn6.addEventListener("click",function(){
+    slider.value = 5
+  });
+  btn7.addEventListener("click",function(){
+    slider.value = 6
+  });
+  btn8.addEventListener("click",function(){
+    slider.value = 7
+  });
+  btn9.addEventListener("click",function(){
+    slider.value = 8
+  });
+  btn10.addEventListener("click",function(){
+    slider.value = 9
+  });
+
+  
+
+
+  var margin = {top: 30, right: 30, bottom: 70, left: 60},
+      width = 800 - margin.left - margin.right,
+      height = 460 - margin.top - margin.bottom;
+  
+  var svg = d3.select("#Vis")
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+    d3.select("#Vis")
+    .append("h4")
+    .attr("id","bar_xAxis_title")
+    .html("Time Periods (years, AD)")
+
+  var x = d3.scaleBand()
+    .range([ 0, width ])
+    .padding(0.2);
+  var xAxis = svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+      
+  var y = d3.scaleLinear()
+    .range([ height, 0]);
+  var yAxis = svg.append("g")
+    .attr("class", "myYaxis")
+
+
+
+
+  var tooltip = d3.select("#Vis")
+    .append("div")
+    .style("display", "none")
+    .style("position", "absolute")
+    .attr("class", "tooltip")
+    .attr("id", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
+    
+
+    const mouseover = function(event, d) {
+    tooltip
+      .style("display", "")
+  }
+    const mousemove = function(event, d) {
+    tooltip
+      .html("Total number of listed buildings from <span id = 'date'>" + d.group + "AD</span> is <span id = 'value'>: " + d.value + "</span><p id = 'gradings'><span id='grade1'>Grade 1 &nbsp;</span> <span id='grade2S'>Grade 2 Star  &nbsp;</span> <span id='grade2'>Grade 2 </span></p>")
+      
+
+      var pie_data = [d.grade1, d.grade2S, d.grade2]
+      var pie_width = 75
+      var pie_height = 75
+
+      var pie_svg = d3.select("#tooltip")
+          .append("svg")
+        .attr("width", pie_width)
+        .attr("height", pie_height)
+        pie_height = pie_svg.attr("height")
+        pie_radius = Math.min(pie_width, pie_height) / 2, 
+        g = pie_svg.append("g").attr("transform", "translate(" + pie_width / 2 +","+ pie_height / 2 + ")");
+
+      var pie_colour = d3.scaleOrdinal(["#7a0177","#c31a8a","#fa9db4"]);
+
+      var pie_pie = d3.pie();
+      
+      var pie_arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(pie_radius);
+
+      var pie_arcs = g.selectAll("pie_arc")
+          .data(pie_pie(pie_data))
+          .enter()
+          .append("g")
+          .attr("class", "pie_arc")
+
+      pie_arcs.append("path")
+        .attr("fill", function(d, i){return pie_colour(i);})
+        .attr("d", pie_arc);
+      
+
+      tooltip
+      .style("left",(event.x)-450+"px")
+      
+      .style("top",(event.y)+"px")
+     
+  }
+  const mouseleave = function(event,d) {
+    tooltip
+      .style("display", "none")
+  }
+
+
+  function update(data){
+    
+    
+
+    var groups = d3.map(data,function(d){return(d.value)})
+    
+
+    x.domain(data.map(function(d) { return d.group; }))
+    xAxis.call(d3.axisBottom(x))
+    
+    y.domain([0, d3.max(data, function(d) { return d.value })]);
+    yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+    var colour = d3.scaleOrdinal(["#9e0142", "#d53e4f", "#f46d43", "#fdae61","#f8c32e","#c1dc38","#abdda4","#66c2a5","#3288bd","#5e4fa2"]);
+
+    
+      
+    var u = svg.selectAll("rect")
+      .data(data)
+
+    u
+      .enter()
+      .append("rect") 
+      .merge(u) 
+      .transition() 
+      .duration(1000)
+        .attr("x", function(d) { return x(d.group); })
+        .attr("y", function(d) { return y(d.value); })
+        .attr("width", x.bandwidth())
+        .attr("height", function(d) { return height - y(d.value); })
+        .attr("class", "bar")
+        .attr("id",function(d) {return (d.group)} )
+        
+        .attr("onclick", "test(id)")
+        .attr("fill", function(i){
+          return colour(i); })
+        d3.selectAll("rect")
+        .on("mouseover", mouseover )
+        .on("mousemove", mousemove )
+        .on("mouseleave",mouseleave)
+        
+        
+      
+    u
+      .exit()
+      .remove()
+    
+  }
+  
+  update(data1)
+  
+</script>
+<h4>This data shows as the time continues closer to current day the more listed buildings remain except within the first 800 years, while also highlighting areas which can be further researched for architectural advancements or historic events which may answer why more listed buildings remain from those specific periods, such as what caused the large increases within the 1000-1200 and 600-1800 periods.</h4>
+
+
+<p id = "list_explain_p">For clarification all listed buildings are separated into three potential groups, the gradings are defined in section 7 of the <a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/757054/Revised_Principles_of_Selection_2018.pdf"> UK Goverment's Principles of Selection for Listed Buildings </a> are:</p>
+  <h4 id = "list_explain_p2">"</h4>
+  <li id = "list_explain_p2">Grade I buildings are of exceptional special interest </li> 
+  <li id = "list_explain_p2">Grade II* buildings are particularly important buildings of more than special interest;</li>  
+  <li id = "list_explain_p2">Grade II buildings are of special interest, warranting every effort to preserve them.</li>
+  <h4 id = "list_explain_p2" style="margin-left: 60%;">"</h4> 
+  <p id = "list_explain_p">The following doughnut graphs show the breakdown of grading ratios within each 200 year time increment</p>
+<h3 id = "GKeyTitle">Keys:</h3>
+<section id ="grade_key_flexwrapper">
+  <div id = "key_buffer"></div>
+  <div id = "Key_div_G1">
+    <h3 id ="Gkey">Grade 1</h3>
+  </div>
+  <div id ="Key_div_G2S">
+    <h3 id ="Gkey">Grade 2 *</h3>
+  </div>
+  <div id = "Key_div_G2">
+    <h3 id = "Gkey">Grade 2</h3>
+  </div>
+  <div id = "key_buffer"></div>
+</section>
+
+
+<section class = "pies_flex_wrapper">
+
+{%for data in datas%}
+
+<div id = "vis{{data.get('id')}}" class = "pies">
+  <!--  <p>{{data.get("timePeriod")}}</p>  -->
+
+
+
+<script>
+  var pies_svg = d3.select("#vis{{data.get('id')}}").append("svg")
+  .attr("width",300)
+  .attr("height",300)
+  .append("g")
+  
+ 
+  pies_svg.append("g")
+    .attr("class","slices");
+  pies_svg.append("g")
+	.attr("class", "labels");
+  pies_svg.append("g")
+	.attr("class", "lines");
+
+var pies_width = 200;
+var pies_height = 200;
+var pies_radius = Math.min(pies_width, pies_height) / 2;
+var pies_colour = d3.scaleOrdinal(["#7a0177","#c31a8a","#fa9db4"]);
+console.log("{{data.get('totalListedBuildings')}}")
+var pies_data = ["{{data.get('grade1')}}","{{data.get('grade2Star')}}","{{data.get('grade2')}}"]
+
+var pies_pie = d3.pie().value(d => d);
+var pies_arc = d3.arc().innerRadius(pies_radius*0.8).outerRadius(pies_radius*0.6);
+  var pies_outer_arc = d3.arc().outerRadius(pies_radius*0.9).innerRadius(pies_radius*0.9);
+
+
+pies_svg.attr("transform","translate("+ pies_width /1.3  +","+ pies_height /1.6 + ")")
+.style("margin-top:25px;")
+
+;
+
+pies_svg.selectAll("path")
+.data(pies_pie(pies_data))
+.enter()
+.append("path")
+.attr("d", pies_arc)
+.attr("fill",(d,i)=>pies_colour(i));
+
+pies_svg.append("g").classed("labels", true);
+pies_svg.append("g").classed("lines", true);
+
+var polyline = pies_svg.select(".lines")
+    .selectAll("polyline")
+    .data(pies_pie(pies_data))
+  .enter().append("polyline")
+    .style("display","")
+    .attr("points",function(d){
+      var pos = pies_outer_arc.centroid(d);
+      pos[0] = pies_radius * 0.85 * (midAngle(d)< Math.PI ? 1: -1);
+      if (pos[1] > 50){
+          pos[1] = pos[1]+(d.index*10)
+        }
+        if(pos[1] < -50) {
+          pos[1] = pos[1]-(d.index*10)
+        }
+      return [pies_arc.centroid(d), pies_outer_arc.centroid(d), pos]
+    });
+
+var label = pies_svg.select(".labels").selectAll("text")
+      .data(pies_pie(pies_data))
+    .enter().append("text")
+      .attr("dy",".35em")
+      .style("display","")
+      .html(function(d){return d.data;})
+      .attr("transform", function(d){
+        var pos = pies_outer_arc.centroid(d);
+        pos[0] = pies_radius * 0.85  * (midAngle(d)< Math.PI ? 1 : -1);
+
+        if (pos[1] > 50){
+          pos[1] = pos[1]+(d.index*10)
+        }
+        if(pos[1] < -50) {
+          pos[1] = pos[1]-(d.index*10)
+        }
+        
+        return "translate(" + pos + ")";
+      })
+      .style("text-anchor", function(d){return(midAngle(d))< Math.PI ? "start":"end";});
+  
+pies_svg.append("text")
+      .attr("class","toolCircle")
+      .attr("dy",5)
+      .html("{{data.get('timePeriod')}}")
+      .style("text-anchor", "middle");
+      
+
+
+function midAngle(d){return d.startAngle + (d.endAngle - d.startAngle)/2;}
+
+            
+  
+
+
+
+
+
+  
+</script>
+</div>
+{%endfor%}
+</section >
+<h4>These visualisations show our attitude towards how significantly we view buildings from specific periods. We can see the trend tends to be the older the building the higher significance it holds and therefore how we view the significance of that time period. For example, it is interesting to see similarities of breakdowns between 1600-1800 and 1800-2000, which may have gone overlooked if simply comparing numbers. </h4>
+</body>
+</html>
