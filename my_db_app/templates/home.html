@@ -135,10 +135,92 @@ polyline{
   stroke-width: 2px;
   fill: none;
 }
+#arrow{
+background-color: #000;
+  position:relative;
+  width:30px;
+  height: 30px;
+  cursor:pointer;
+/*   border:solid 1px white; */
+  transition:0.5s;
+  overflow:hidden;
+}
 
+#arrow:hover{
+/*  animation:borderAni 5s cubic-bezier(0, 0.6, 1, 0.4); */
+      border:solid 2px white; 
+    border-radius:50%;
+}
+#arrow:after{
+  position:absolute;
+  display:block;
+  content:"";
+  color:white;
+  width: 20px;
+  height: 15px;
+/*   border:solid 1px;  */
+  top:-1px;
+  border-bottom:solid 2px;
+  transform:translatex(4px);
+}
+
+#arrow:before{
+  position:absolute;
+  display:block;
+  content:"";
+  color:white;
+  width: 8px;
+  height: 8px;
+/*   border:solid 1px;  */
+  border-top:solid 2px;
+  border-left:solid 2px;
+  top:50%;
+  left:2px;
+  transform-origin:0% 0%;
+  transform:rotatez(-45deg);
+
+}
+#arrow:hover:before{
+ animation: aniArrow01 1s cubic-bezier(0, 0.6, 1, 0.4) infinite 0.5s;
+}
+
+#arrow:hover:after{
+ animation: aniArrow02 1s cubic-bezier(0, 0.6, 1, 0.4) infinite 0.5s;
+}
+
+
+@keyframes aniArrow01 {
+  0% {
+    transform:rotatez(-45deg) translateY(30px) translateX(30px);
+  }
+  100% {
+    transform: rotatez(-45deg) translateY(-35px) translateX(-35px);
+  }
+}
+
+
+@keyframes aniArrow02 {
+  0% {
+    transform:translateX(45px);
+  }
+  100% {
+    transform:translateX(-44px);
+  }
+}
+
+@keyframes borderAni{
+   0% {
+    border:solid 2px white;
+  }
+  100% {    
+    border:solid 2px white; 
+    border-radius:50%;
+  }
+}
 </style>
 
 <body>
+  <a href="https://jojah.onrender.com/"><div id="arrow"></div></a>
   <h2>Break Down of Listed Buildings between 0-2000AD</h2>
   <p id = "list_explain_p">A listed building is one noted by Historic England for having some form of special architectural or historic significance, ensuring their protection as the site's use evolves over time for future generations.&nbsp;<a href="https://historicengland.org.uk/listing/what-is-designation/">A range of sites can be listed</a>, however the data presented reports on Listed Buildings specifically. <a href="https://historicengland.org.uk/listing/what-is-designation/listed-buildings/"> Historic England consider the general principles to listings to be</a>: </p>
   <p id = "list_explain_p2">"All buildings built before 1700 which survive in anything like their original condition are likely to be listed, as are most buildings built between 1700 and 1850. Particularly careful selection is required for buildings from the period after 1945. Buildings less than 30 years old are not normally considered to be of special architectural or historic interest because they have yet to stand the test of time."</p>
@@ -416,12 +498,8 @@ var data10 = [{group: "0-200", value: parseInt("{{listedBuildingList[0]}}"), gra
 
 
   function update(data){
-    
-    
-
     var groups = d3.map(data,function(d){return(d.value)})
     
-
     x.domain(data.map(function(d) { return d.group; }))
     xAxis.call(d3.axisBottom(x))
     
