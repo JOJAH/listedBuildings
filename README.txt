@@ -1,3 +1,5 @@
+A dynamic site which shows the breakdown of english listed buildings by their date and grade listings. 
+
 Assuming device has python (with pip) and git bash terminal installed.
 
 After unzipping folder and opening on the git bash terminal 
